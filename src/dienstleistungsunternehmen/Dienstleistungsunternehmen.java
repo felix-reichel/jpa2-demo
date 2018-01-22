@@ -97,9 +97,25 @@ public class Dienstleistungsunternehmen {
         em.persist(exr2);
 
         em.getTransaction().commit();
-        
         em.getTransaction().begin();
 
+        System.out.println("=== QUERY 1 ===");
+        Query q1 = em.createQuery("SELECT s FROM SparePart s WHERE s.name = 'Rohr'");
+        List<SparePart> spareParts = q1.getResultList();
+        spareParts.subList(0, 1).forEach(o -> {
+            o.setName("PVC Rohr");
+            em.persist(o);
+        });
+        
+        System.out.println("=== QUERY 2 ===");
+        Query q2 = em.createQuery("SELECT r FROM Repair r JOIN FETCH r.technician JOIN FETCH r.spareParts");
+        List<Repair> repairs = q2.getResultList();
+        repairs.forEach(r -> {
+            System.out.println(r);
+            System.out.println(r.getTechnician());
+            System.out.println(r.getSpareParts());
+        });
+            
         TypedQuery<Repair> longWarrantyRepairs = em.createQuery("SELECT r FROM Repair r WHERE r.warranty = true AND r.duration > 30", Repair.class);
         List<Repair> res1 = longWarrantyRepairs.getResultList();
         System.out.println("=== TYPED QUERY 1 ===");
